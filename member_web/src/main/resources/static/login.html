@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录页面</title>
+</head>
+<script src="js/jquery-3.4.1.min.js"></script>
+<script>
+
+    // 自定义jquery的方法，将Form表单中的内容转换成json
+    $.fn.serializeJson=function(){
+        var serializeObj={};
+        var array=this.serializeArray();
+        var str=this.serialize();
+        $(array).each(function(){
+            if(serializeObj[this.name]){
+                if($.isArray(serializeObj[this.name])){
+                    serializeObj[this.name].push(this.value);
+                }else{
+                    serializeObj[this.name]=[serializeObj[this.name],this.value];
+                }
+            }else{
+                serializeObj[this.name]=this.value;
+            }
+        });
+        return serializeObj;
+    };
+
+
+    function logins() {
+        var params=$("form[id='myform1']").serializeJson();
+
+        $.ajax({
+
+            url:"emp/login",
+
+            data:params,
+
+            type:"post",
+
+            statusCode:{
+
+                200:function () {
+
+                    alert("登录成功!")
+                    window.location.href="list.html";
+
+                },
+
+                500:function () {
+                    alert("登录失败!")
+
+                }
+            }
+    })
+    }
+
+    </script>
+
+<body>
+
+
+   <form id="myform1">
+   账号:<input type="text" value="" name="name"><br>
+   密码:<input type="text" value="" name="id"><br>
+
+       <input type="button" value="登录" onclick="logins()">
+
+   </form>
+</body>
+</html>

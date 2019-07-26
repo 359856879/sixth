@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>更新</title>
+</head>
+<script src="js/jquery-3.4.1.min.js"></script>
+
+
+<script>
+
+
+    $(function () {
+
+        var id=location.search.split("=")[1];
+        $.ajax({
+
+
+            url:"/emp/update1/"+id,
+
+            type:"get",
+
+            statusCode:{
+                200:function (rel) {
+
+                    $(rel).each(function (index, ele) {
+
+
+                        $("input[name='name']").val(ele.name);
+                        $("input[name='age']").val(ele.age);
+                        $("input[name='sex']").val(ele.sex);
+                        $("input[name='id']").val(ele.id);
+
+                        //记录省份id
+                        info=ele.provincials.provincialid;
+
+                        $("select[name='provinceid']").append("<option value='"+ele.provincials.provincialid+"'>"+ele.provincials.provincialname+"</option>");
+                        $("select[name='city']").append("<option value='"+ele.citys.cityid+"'>"+ele.citys.cityname+"</option>");
+
+                       /* $("select[name='provinceid'] option[value='" + ele.provincials.provinceid + "']").prop("selected", true)
+                        $("select[name='city'] option[value='" + ele.citys.cityid + "']").prop("selected", true)*/
+                        $("img[name='imgs']").prop("src",ele.imgsrc);
+                        /*      $("select[name='provinceid'] option[value='"+ele.provincials.provinceid+"']").prop("selected",true);*/
+                        /*      $("select[name='city'] option[value='"+ele.citys.cityid+"']").prop("selected",true);*/
+
+                    })
+
+                    findPro();
+                },
+
+
+                500:function () {
+                    alert("服务器错误！")
+
+                }
+            }
+
+        })
+
+    })
+
+    function findPro() {
+
+        $.ajax({
+
+            url: "province/findAll",
+
+            type: "get",
+
+            dataType: "json",
+
+            statusCode: {
+                200: function (rel) {
+
+                    //把下拉列表中的其他数据删除
+                    $("select[name='provinceid']").html("")
+                    $(rel).each(function (index, ele) {
+
+                        $("select[name='provinceid']").append("<option value='" + ele.provincialid + "'>" + ele.provincialname + "</option>")
+
+                    })
+
+                    //回显时默认选中当前对象所处的省份
+                    $("select[name='provinceid'] option[value='"+info+"']").prop("selected",true)
+
+
+                    //省市联动
+                    $("select[name='provinceid']").change(function () {
+
+                        var id = $("select[name='provinceid']").val();
+                        $.ajax({
+
+                            url: "city/findAll/" + id,
+
+                            dataType: "json",
+
+                            type: "get",
+
+                            statusCode: {
+
+                                200: function (rel) {
+
+                                    //防止数据重复拼接
+                                    $("select[name='city']").html("");
+                                    $(rel).each(function (index, ele) {
+
+                                        $("select[name='city']").append("<option value='" + ele.cityid + "'>" + ele.cityname + "</option>")
+
+                                    })
+
+                                }
+                            },
+                            500: function () {
+                                alert("更新失败!")
+
+                            }
+
+                        })
+
+
+                    })
+
+
+                },
+                500: function () {
+
+                    alert("数据加载错误!")
+
+                }
+            }
+
+
+        })
+
+    }
+
+
+    function updates() {
+
+
+        //1.准备一个FormData对象,用来封装表单数据
+        var data=new FormData();
+        //2.获取上传文件--files是file控件的隐藏属性
+        var files=$("#files").prop("files");
+        data.append("file",files[0]);
+        //3.获取其余的元素
+        data.append("name",$("input[name='name']").val())
+        data.append("age",$("input[name='age']").val())
+        data.append("sex",$("input[name='sex']").val())
+        data.append("provinceid",$("select[name='provinceid']").val())
+        data.append("city",$("select[name='city']").val())
+        data.append("id",$("input[name='id']").val())
+
+
+        $.ajax({
+
+            url:"emp/update2",
+
+            data:data,
+
+            type:"post",
+
+            //上传图片需要在发送ajax时写以下三个属性
+            cache:false,
+            processData:false,
+            contentType:false,
+
+
+
+            statusCode:{
+
+                204:function () {
+
+                    window.location.href="list.html";
+
+                },
+                500:function () {
+                    alert("更新失败！")
+
+                }
+            }
+
+
+
+
+        })
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+</script>
+<body>
+
+<form id="for">
+   <input type="hidden" name="id" value="" >
+    姓名:<input type="text" value="" name="name"><br>
+    年龄:<input type="text" value="" name="age"><br>
+    性别:<input type="text" value="" name="sex"><br>
+    所在省:<select name="provinceid"><option><--省份信息--></option></select><br>
+    所在市:<select name="city"></select><br>
+    头像:
+    <img name='imgs' width='100px' height='100px' src="">
+    <input type="file" name="file" id="files"><br>
+
+
+    <input type="button" value="更新" onclick="updates()"> <input type="button" onclick="history.back(-1)" value="关闭">
+
+</form>
+
+</body>
+</html>

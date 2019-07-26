@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>新增</title>
+</head>
+<script src="js/jquery-3.4.1.min.js"></script>
+<script>
+    $(function () {
+
+        $.ajax({
+
+            url:"emp/findPro",
+
+            type:"get",
+
+            dataType:"json",
+
+            statusCode:{
+                200:function (rel) {
+
+                    $(rel).each(function (index,ele) {
+
+                        $("select[name='provinceid']").append("<option value='"+ele.provincialid+"'>"+ele.provincialname+"</option>")
+
+                    })
+
+
+                    //省市联动
+                    $("select[name='provinceid']").change(function () {
+
+
+                        var id=$("select[name='provinceid']").val();
+
+                        $.ajax({
+
+
+                            url:"emp/findCity/"+id,
+
+                            dataType:"json",
+
+                            type:"get",
+
+                            statusCode:{
+
+                                200:function (rel) {
+
+                                    alert("更新成功!")
+                                $("select[name='city']").html("");
+                                    $(rel).each(function(index,ele) {
+
+                                        $("select[name='city']").append("<option value='"+ele.cityid+"'>"+ele.cityname+"</option>")
+
+                                    })
+
+
+                            }
+                            },
+                            500:function () {
+                                alert("更新失败!")
+
+                            }
+
+                        })
+
+
+                    })
+
+
+                },
+                500:function () {
+
+                    alert("数据加载错误!")
+
+                }
+            }
+
+
+        })
+
+    })
+
+    //添加方法
+    function adds() {
+
+        //1.准备一个FormData对象,用来封装表单数据
+        var data=new FormData();
+        //2.获取上传文件--files是file控件的隐藏属性
+        var files=$("#files").prop("files");
+        data.append("file",files[0]);
+        //3.获取其余的元素
+        data.append("name",$("input[name='name']").val())
+        data.append("age",$("input[name='age']").val())
+        data.append("sex",$("input[name='sex']").val())
+        data.append("provinceid",$("select[name='provinceid']").val())
+        data.append("city",$("select[name='city']").val())
+
+
+        $.ajax({
+
+
+            url:"emp/add",
+
+            type:"post",
+
+            data:data,
+
+
+            //上传图片需要在发送ajax时写以下三个属性
+            cache:false,
+            processData:false,
+            contentType:false,
+
+
+
+            statusCode:{
+
+                201:function () {
+
+                    alert("添加成功!")
+                    window.location.href="list.html";
+                },
+                500:function () {
+                    alert("添加失败!")
+
+                }
+            }
+
+        })
+
+
+
+    }
+
+
+
+
+
+</script>
+<body>
+
+<p align="center">个人信息</p>
+<form id="for">
+
+
+姓名:<input type="text" value="" name="name"><br>
+年龄:<input type="text" value="" name="age"><br>
+性别:<input type="text" value="" name="sex"><br>
+所在省:<select name="provinceid"><option><--省份信息--></option></select><br>
+所在市:<select name="city"></select><br>
+头像:<input type="file" name="file" id="files"><br>
+
+
+<input type="button" value="新增" onclick="adds()"> <input type="button" onclick="history.back(-1)" value="关闭">
+
+</form>
+
+
+
+
+
+
+</body>
+</html>

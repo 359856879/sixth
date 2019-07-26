@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script src="js/jquery-3.4.1.min.js"></script>
+<script>
+
+
+    //页面加载完去后台查询所有
+    $(function () {
+
+        $.ajax({
+
+            url:"emp/findAll",
+
+            dataType:"json",
+
+            type:"get",
+
+            statusCode:{
+                200:function (rel) {
+
+                    $(rel).each(function (index,ele) {
+                        $("tbody[id='s01']").append("<tr>\n" +
+                            "        <th>"+ele.id+"</th>\n" +
+                            "        <th>"+ele.name+"</th>\n" +
+                            "        <th>"+ele.age+"</th>\n" +
+                            "        <th>"+ele.sex+"</th>\n" +
+                            "        <th><img width='100px' height='100px' src='"+ele.imgsrc+"'></th>\n" +
+                            "        <th>"+ele.provincials.provincialname+"</th>\n" +
+                            "        <th>"+ele.citys.cityname+"</th>\n" +
+                            "        <th><a href='update.html?id="+ele.id+"'>编辑</a>" +
+                            "            <a href='show.html?id="+ele.id+"'>详情</a>" +
+                            "            <a href='#' onclick='deletes("+ele.id+")'>删除</a></th>\n" +
+                            "    </tr>")
+                    })
+
+
+                },
+                500:function () {
+                    alert("查询列表错误!")
+
+                }
+            }
+
+        })
+
+    })
+
+
+    function deletes(id) {
+
+        $.ajax({
+
+            url:"emp/delete/"+id,
+
+            type:"get",
+
+            statusCode:{
+
+                204:function () {
+                    alert("删除成功!")
+                    window.location.reload("list.html");
+
+                },
+                500:function () {
+                    alert("服务器异常！")
+
+                }
+            }
+        })
+
+    }
+
+</script>
+<body>
+    <form>
+    姓名:<input type="text">
+    <input type="button" value="搜索">
+    </form>
+
+<br>
+<table id="mytable" border=1 >
+
+    <tr>
+        <th>id</th>
+        <th>姓名</th>
+        <th>年龄</th>
+        <th>性别</th>
+        <th>头像</th>
+        <th>所在省</th>
+        <th>所在市</th>
+        <th>操作</th>
+    </tr>
+    <tbody id="s01">
+
+
+    </tbody>
+  <!--  <tr>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+    </tr>-->
+
+
+</table>
+
+<a href="add.html"><input type="button" value="添加"></a>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>查看</title>
+</head>
+<script src="js/jquery-3.4.1.min.js"></script>
+<script>
+
+    $(function () {
+
+        var id=location.search.split("=")[1];
+       /* alert(id);*/
+
+        //根据对象id去后台找到对象回显数据
+
+        $.ajax({
+
+            url:"emp/findEmp/"+id,
+
+            type:"get",
+
+            dataType:"json",
+
+            statusCode:{
+
+                200:function(rel){
+
+                    $(rel).each(function (index,ele) {
+
+                        $("span[id='name']").append(ele.name);
+                        $("span[id='age']").append(ele.age);
+                        $("span[id='sex']").append(ele.sex);
+
+
+                        $("span[id='provinceid']").append(ele.provincials.provincialname);
+                        $("span[id='city']").append(ele.citys.cityname);
+
+                        $("span[id='imgsrc']").append("<img height='100px' width='100px' src='"+ele.imgsrc+"'>");
+
+                    })
+
+            },
+
+            500:function(){
+
+                    alert("数据加载出现错误!")
+            }
+        }
+
+
+        })
+
+    })
+</script>
+<body>
+     <p align="查看个人信息"></p>
+
+<div>
+    <span id="name">姓名:</span><br>
+    <span id="age">年龄:</span><br>
+    <span id="sex">性别:</span><br>
+    <span id="provinceid">所在省:</span><br>
+    <span id="city">所在市:</span><br>
+    <p></p>
+    头像<span id="imgsrc"></span><br>
+
+     <input type="button" onclick="history.back(-1)" value="关闭">
+
+</div>
+</body>
+</html>
